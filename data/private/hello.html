@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<style>
+.underline-btn {
+  padding: 12px 24px;
+  background: transparent;
+  color: #333;
+  border: 2px solid #333;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: color 1s linear;
+}
+
+.underline-btn::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: -100%;
+  width: 100%;
+  height: 2px;
+  background: #333;
+  transition: left 0.3s ease;
+}
+
+.underline-btn:hover {
+  color: #FF6B6B;
+}
+
+.underline-btn:hover::before {
+  left: 0;
+}
+</style>
+<meta charset="UTF-8">
+</head>
+<body>
+  <button class="underline-btn">Подчеркивание</button>
+</body>
+</html>

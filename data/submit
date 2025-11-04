@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+    <body>
+        <script>
+            if (window.history.length > 1) {
+                window.history.back();
+            } else if (window.opener) {
+                window.close();
+            }
+        </script>
+    </body>
+</html>

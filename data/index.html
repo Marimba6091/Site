@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>This is base! - Главная страница</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .container {
+            text-align: center;
+            padding: 2rem;
+            max-width: 800px;
+        }
+
+        .main-title {
+            font-size: 5rem;
+            font-weight: 900;
+            margin-bottom: 2rem;
+            text-shadow: 3px 3px 0 rgba(0,0,0,0.1);
+            background: linear-gradient(45deg, #fff, #f0f0f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: float 3s ease-in-out infinite;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            font-size: 1.8rem;
+            margin-bottom: 3rem;
+            font-weight: 300;
+            opacity: 0.9;
+        }
+
+        .welcome-message {
+            font-size: 1.3rem;
+            margin-bottom: 3rem;
+            line-height: 1.7;
+            opacity: 0.9;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .feature {
+            background: rgba(255,255,255,0.1);
+            padding: 2rem;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .feature:hover {
+            transform: translateY(-5px);
+            background: rgba(255,255,255,0.15);
+        }
+
+        .feature-icon {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            width: 50px;
+            height: 60px;
+            border-radius: 50%;
+        }
+
+        .feature-title {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .feature-description {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 18px 40px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255,255,255,0.3);
+            backdrop-filter: blur(10px);
+            margin: 1rem;
+        }
+
+        .cta-button:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        }
+
+        .secondary-button {
+            background: transparent;
+            border: 2px solid rgba(255,255,255,0.5);
+        }
+
+        .secondary-button:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .main-image {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 2rem auto;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid rgba(255,255,255,0.3);
+            animation: float 4s ease-in-out infinite;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-10px) rotate(2deg); }
+            66% { transform: translateY(-5px) rotate(-2deg); }
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .Center {
+            text-align: center;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        a {
+            color: white;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    
+    <div class="container">
+        <!-- Замените "logo.jpg" на путь к вашей картинке -->
+        <img src="img/marimba.jpg" alt="Логотип" class="main-image">
+        
+        <h1 class="main-title">This is base!</h1>
+        <p class="subtitle">Добро пожаловать на главную страницу</p>
+        
+        <div class="welcome-message">
+            Это ваша стартовая точка в удивительное путешествие по нашему сайту. 
+            Отсюда начинаются все возможности и открытия.
+        </div>
+
+        <div class="features">
+            <a class="feature", href="chaadaevy.html">
+                <img class="feature-icon", src="img/AleksandrPushkin.jpg">
+                <h3 class="feature-title">К Чаадаеву</h3>
+                <p class="feature-description">А.С.Пушкин 1818г.</p>
+            </a>
+            <div class="feature">
+                <div class="feature-icon">💫</div>
+                <h3 class="feature-title">Уникальный дизайн</h3>
+                <p class="feature-description">Современный и привлекательный интерфейс</p>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <a href="/listing" class="cta-button">Начать работу</a>
+            <a href="#" class="cta-button secondary-button">Узнать больше</a>
+        </div>
+    </div>
+
+    <script>
+        // Создание звездного фона
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const starsCount = 150;
+            
+            for (let i = 0; i < starsCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                
+                // Случайные позиции и размеры
+                const size = Math.random() * 3 + 1;
+                const left = Math.random() * 100;
+                const top = Math.random() * 100;
+                const delay = Math.random() * 3;
+                
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.left = `${left}%`;
+                star.style.top = `${top}%`;
+                star.style.animationDelay = `${delay}s`;
+                
+                starsContainer.appendChild(star);
+            }
+        }
+
+        createStars();
+    </script>
+</body>
+</html>

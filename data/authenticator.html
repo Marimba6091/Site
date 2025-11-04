@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <title>аунтерификация</title>
+        <style>
+            * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            }
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+                display: flex;
+                align-items: left;
+                justify-content: space-between;
+                color: white;
+            }
+            .search-label {
+            display: flex;
+            align-items: center;
+            box-sizing: border-box;
+            position: relative;
+            border: 1px solid transparent;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #3D3D3D;
+            padding: 9px;
+            cursor: text;
+            }
+
+            .search-label:hover {
+            border-color: gray;
+            }
+
+            .search-label:focus-within {
+            background: #464646;
+            border-color: gray;
+            }
+
+            .search-label input {
+            outline: none;
+            width: 100%;
+            border: none;
+            background: none;
+            color: rgb(162, 162, 162);
+            }
+
+            .search-label input:focus+.slash-icon,
+            .search-label input:valid+.slash-icon {
+            display: none;
+            }
+
+            .search-label input:valid~.search-icon {
+            display: block;
+            }
+
+            .search-label input:valid {
+            width: calc(100% - 22px);
+            transform: translateX(20px);
+            }
+
+            .search-label svg,
+            .slash-icon {
+            position: absolute;
+            color: #7e7e7e;
+            }
+
+            .search-icon {
+            display: none;
+            width: 12px;
+            height: auto;
+            }
+
+            .slash-icon {
+            right: 7px;
+            border: 1px solid #393838;
+            background: linear-gradient(-225deg, #343434, #6d6d6d);
+            border-radius: 3px;
+            text-align: center;
+            box-shadow: inset 0 -2px 0 0 #3f3f3f, inset 0 0 1px 1px rgb(94, 93, 93), 0 1px 2px 1px rgba(28, 28, 29, 0.4);
+            cursor: pointer;
+            font-size: 12px;
+            width: 15px;
+            }
+
+            .slash-icon:active {
+            box-shadow: inset 0 1px 0 0 #3f3f3f, inset 0 0 1px 1px rgb(94, 93, 93), 0 1px 2px 0 rgba(28, 28, 29, 0.4);
+            text-shadow: 0 1px 0 #7e7e7e;
+            color: transparent;
+            }
+            .feature {
+            background: rgba(255,255,255,0.1);
+            padding: 1rem;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+            color: #ffffffcc; 
+            display: flex;
+            align-items: center;
+            margin-left: auto;
+            margin-right: auto;
+            cursor: pointer;
+            margin-top: 10px;
+            gap: 10px;
+            flex: 1;
+            max-width: 100px;
+            height: 15px;
+            }
+            .feature:hover {
+                transform: translateY(-5px);
+                background: rgba(255,255,255,0.15);
+            }
+            .contaner
+            {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                margin-left: auto;
+                margin-right: auto;
+                margin-top: 5px;
+            }
+            .ath-title
+            {
+                display: flex;
+                flex-wrap: wrap;
+                font-size: 2.5rem;
+                margin-bottom: 1rem;
+                font-weight: 300;
+                justify-content: center;
+                margin-left: auto;
+                margin-right: auto;
+                font-weight: 900;
+            }
+            .button-group {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 2rem;
+            }
+            .cta-button {
+            display: inline-block;
+            padding: 18px 40px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255,255,255,0.3);
+            backdrop-filter: blur(10px);
+            margin: 1rem;
+            }
+            .cta-button:hover {
+                background: rgba(255,255,255,0.3);
+                transform: translateY(-3px);
+                box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+            }
+
+            .secondary-button {
+                background: transparent;
+                border: 2px solid rgba(255,255,255,0.5);
+            }
+
+            .secondary-button:hover {
+                background: rgba(255,255,255,0.1);
+            }
+        </style>
+    </head>
+    <body>
+        <div class="contaner">
+            <p class="ath-title">
+                
+                Введите пароль
+
+            </p>
+            <form method="post" action="/submit">
+                <label class="search-label">
+                    <input type="text" name="password" class="input" required="" placeholder="password">
+                    <kbd class="slash-icon">/</kbd>
+                    <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512" x="0" y="0" viewBox="0 0 56.966 56.966" style="enable-background:new 0 0 512 512" xml:space="preserve">
+                        <g>
+                            <path d="M55.146 51.887 41.588 37.786A22.926 22.926 0 0 0 46.984 23c0-12.682-10.318-23-23-23s-23 10.318-23 23 10.318 23 23 23c4.761 0 9.298-1.436 13.177-4.162l13.661 14.208c.571.593 1.339.92 2.162.92.779 0 1.518-.297 2.079-.837a3.004 3.004 0 0 0 .083-4.242zM23.984 6c9.374 0 17 7.626 17 17s-7.626 17-17 17-17-7.626-17-17 7.626-17 17-17z" fill="currentColor" data-original="#000000" class=""></path>
+                        </g>
+                    </svg>
+                </label>
+            <button type="submit" class="feature">Отправить</button>
+            </form>
+            <div class="button-group">
+                <a href="/" class="cta-button">На главную</a>
+                <a href="javascript: location.reload()" class="cta-button secondary-button">Перезагрузить</a>
+            </div>
+    </body>
+</html>
