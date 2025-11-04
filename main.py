@@ -17,7 +17,7 @@ def start(host):
             th.Thread(target=greet, args=(con, adr, host)).start()
 
 if __name__ == "__main__":
-    host = "26.105.156.176"
+    host = socket.gethostname()
     port = 80
     server = socket.socket()
     server.bind((host, port))
