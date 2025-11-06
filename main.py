@@ -10,6 +10,7 @@ def greet(con, adr, host):
         con.close()
 
 def start(host):
+    print("Start")
     while True:
         con = None
         con, adr = server.accept()
