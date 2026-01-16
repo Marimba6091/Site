@@ -1,38 +1,95 @@
 <!DOCTYPE html>
 <html lang="ru">
-    <head>
-        <title>.title.</title>
-        <meta charset="UTF-8">
-        <style>
-            * {
+<head>
+    <title>data/ - File Manager</title>
+    <meta charset="UTF-8">
+    <style>
+        * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            }
-            body {
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                min-height: 100vh;
-                display: flex;
-                align-items: left;
-                justify-content: space-between;
-                color: white;
-            }
-            .features {
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+            color: white;
+            position: relative;
+        }
+        .upload-zone {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.1);
+            padding: 1.5rem;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 2px dashed rgba(255,255,255,0.3);
+            width: 300px;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        .upload-zone.drag-over {
+            background: rgba(255,255,255,0.15);
+            border-color: rgba(255,255,255,0.6);
+            transform: scale(1.02);
+        }
+        .upload-zone h3 {
+            margin-bottom: 1rem;
+            color: white;
+        }
+        .upload-button {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            width: 100%;
+            transition: background 0.3s ease;
+        }
+        .upload-button:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        .progress-container {
+            margin-top: 1rem;
+            display: none;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #8BC34A);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .progress-text {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.9);
+        }
+        .file-info {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.8);
+        }
+        .features {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
+            gap: 1.5rem;
             margin-bottom: 1rem;
-            }
-            .container {
-            text-align: center;
-            padding: 2rem;
+        }
+        .container {
             max-width: 800px;
-            justify-content: space-between;
-            flex: 2;
-            }
-            .feature-play
-            {
+        }
+        .feature {
             background: rgba(255,255,255,0.1);
             padding: 1rem;
             border-radius: 20px;
@@ -45,41 +102,269 @@
             align-items: center;
             gap: 10px;
             flex: 1;
-            width: 55px;
-            }
-            .feature {
-            background: rgba(255,255,255,0.1);
-            padding: 1rem;
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.2);
-            transition: all 0.3s ease;
-            color: #ffffffcc;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex: 1;
-            }
-            .feature-play:hover {
-                transform: translateY(-5px);
-                background: rgba(255,255,255,0.15);
-            }
-            .icon {
+        }
+        .icon {
             width: 20px;
             height: 20px;
-            position: relative;  /* Позиционирование для смещения вниз */
-            top: 10%;  /* Смещение вниз на 4px (примерно 20% от 20px высоты иконки; adjust as needed) */
-            }
-            .feature:hover {
-                transform: translateY(-5px);
-                background: rgba(255,255,255,0.15);
-            }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-.add_data.
+        }
+        .feature:hover {
+            transform: translateY(-5px);
+            background: rgba(255,255,255,0.15);
+        }
+        .status-message {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            display: none;
+            z-index: 1001;
+        }
+        .status-message.success {
+            background: rgba(76, 175, 80, 0.9);
+        }
+        .status-message.error {
+            background: rgba(244, 67, 54, 0.9);
+        }
+    </style>
+</head>
+<body>
+    <!-- Зона загрузки файлов -->
+    <div class="upload-zone" id="uploadZone">
+        <h3>📤 Перетащите файл сюда</h3>
+        <button class="upload-button" id="uploadButton">Выбрать файл</button>
+        <input type="file" id="fileInput" style="display: none;">
+        
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">0%</div>
+            <div class="file-info" id="fileInfo"></div>
         </div>
-    </body>
+    </div>
+
+    <!-- Сообщения о статусе -->
+    <div class="status-message" id="statusMessage"></div>
+
+    <!-- Содержимое страницы -->
+    <div class="container">
+.add_data.
+    </div>
+
+    <script>
+        // Конфигурация
+        const CHUNK_SIZE = 1024 * 1024; // 1MB chunks
+        const UPLOAD_URL = '/upload'; // URL для загрузки файлов
+        
+        // Элементы DOM
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+        const uploadButton = document.getElementById('uploadButton');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const fileInfo = document.getElementById('fileInfo');
+        const statusMessage = document.getElementById('statusMessage');
+
+        // Переменные для загрузки
+        let currentFile = null;
+        let uploadId = null;
+        let chunkIndex = 0;
+        let totalChunks = 0;
+
+        // Обработчики drag and drop
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadZone.addEventListener(eventName, preventDefaults, false);
+            document.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadZone.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadZone.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight() {
+            uploadZone.classList.add('drag-over');
+        }
+
+        function unhighlight() {
+            uploadZone.classList.remove('drag-over');
+        }
+
+        // Обработка сброса файла
+        uploadZone.addEventListener('drop', handleDrop, false);
+        uploadButton.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', handleFileSelect);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        }
+
+        function handleFileSelect(e) {
+            const files = e.target.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        }
+
+        function handleFile(file) {
+            currentFile = file;
+            chunkIndex = 0;
+            totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+            
+            // Показать информацию о файле
+            fileInfo.innerHTML = `
+                <strong>${file.name}</strong><br>
+                Размер: ${formatBytes(file.size)}<br>
+                Частей: ${totalChunks}
+            `;
+            
+            progressContainer.style.display = 'block';
+            uploadFileChunked();
+        }
+
+        // Форматирование размера файла
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Загрузка файла частями
+        async function uploadFileChunked() {
+            if (!currentFile) return;
+
+            try {
+                // Начать загрузку
+                if (!uploadId) {
+                    const startResponse = await fetch(`${UPLOAD_URL}/start`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            filename: currentFile.name,
+                            fileSize: currentFile.size,
+                            totalChunks: totalChunks,
+                            chunkSize: CHUNK_SIZE
+                        })
+                    });
+
+                    const startData = await startResponse.json();
+                    
+                    if (!startData.success) {
+                        throw new Error(startData.error || 'Ошибка начала загрузки');
+                    }
+                    
+                    uploadId = startData.uploadId;
+                    showStatus('Начало загрузки...', 'info');
+                }
+
+                // Загружать чанки по очереди
+                while (chunkIndex < totalChunks) {
+                    const start = chunkIndex * CHUNK_SIZE;
+                    const end = Math.min(start + CHUNK_SIZE, currentFile.size);
+                    const chunk = currentFile.slice(start, end);
+
+                    const formData = new FormData();
+                    formData.append('chunk', chunk);
+                    formData.append('uploadId', uploadId);
+                    formData.append('chunkIndex', chunkIndex);
+                    formData.append('totalChunks', totalChunks);
+                    formData.append('filename', currentFile.name);
+
+                    const response = await fetch(`${UPLOAD_URL}/chunk`, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const result = await response.json();
+
+                    if (!result.success) {
+                        throw new Error(result.error || 'Ошибка загрузки части файла');
+                    }
+
+                    // Обновить прогресс
+                    const progress = ((chunkIndex + 1) / totalChunks) * 100;
+                    progressFill.style.width = `${progress}%`;
+                    progressText.textContent = `${Math.round(progress)}%`;
+
+                    chunkIndex++;
+
+                    // Если это последний чанк, завершить загрузку
+                    if (chunkIndex === totalChunks) {
+                        const finishResponse = await fetch(`${UPLOAD_URL}/finish`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                uploadId: uploadId,
+                                filename: currentFile.name,
+                                fileSize: currentFile.size
+                            })
+                        });
+
+                        const finishData = await finishResponse.json();
+                        
+                        if (finishData.success) {
+                            showStatus('Файл успешно загружен!', 'success');
+                            // Обновить страницу через 2 секунды
+                            setTimeout(() => location.reload(), 2000);
+                        } else {
+                            throw new Error(finishData.error || 'Ошибка завершения загрузки');
+                        }
+                    }
+                }
+
+            } catch (error) {
+                console.error('Ошибка загрузки:', error);
+                showStatus(`Ошибка: ${error.message}`, 'error');
+                
+                // Сбросить состояние
+                resetUpload();
+            }
+        }
+
+        // Показать статусное сообщение
+        function showStatus(message, type = 'info') {
+            statusMessage.textContent = message;
+            statusMessage.className = 'status-message ' + type;
+            statusMessage.style.display = 'block';
+            
+            setTimeout(() => {
+                statusMessage.style.display = 'none';
+            }, 5000);
+        }
+
+        // Сбросить состояние загрузки
+        function resetUpload() {
+            currentFile = null;
+            uploadId = null;
+            chunkIndex = 0;
+            totalChunks = 0;
+            progressFill.style.width = '0%';
+            progressText.textContent = '0%';
+            progressContainer.style.display = 'none';
+            fileInfo.innerHTML = '';
+        }
+    </script>
+</body>
 </html>

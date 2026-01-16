@@ -1,10 +1,11 @@
 import socket
 import threading as th
-from server.net import Net, show_content
+from server.net import show_content
+from server.net import Net
 
 
 def greet(con, adr, host):
-    request = con.recv(1024)
+    request = con.recv(2_147_483_648)
     if request:
         con.send(show_content(request, adr, host))
         con.close()
@@ -19,6 +20,7 @@ def start(host):
 
 if __name__ == "__main__":
     host = socket.gethostname()
+    print(host)
     port = 80
     server = socket.socket()
     server.bind((host, port))

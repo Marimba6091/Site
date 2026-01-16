@@ -3,13 +3,15 @@ import os
 import datetime as dt
 import signal
 import json
+import hashlib
 
 
 class Net:
     def __init__(self, chest: str, href: str):
         self.chest = chest
         self.href = href
-        self.__passwords = {"admin": "admin"}
+        self.__passwords = {"admin": ["admin"]}
+        print(href)
 
     def date(self, str=True):
         dat = dt.datetime.now()
@@ -26,31 +28,34 @@ class Net:
         file = open("authenticator.json", "r")
         dct = json.load(file)
         file.close()
-        if dct["admin"]:
-            for i in range(len(dct["admin"])):
-                dat = dt.datetime.now() - dt.datetime.fromisoformat(dct["admin"][i][1])
-                if dat.seconds // 60 > 5:
-                    file = open("authenticator.json", "w")
-                    dct["admin"].pop(i)
-                    json.dump(dct, file)
-                    file.close()
+        if dct:
+            for step in dct:
+                for i in range(len(dct[step])):
+                    dat = dt.datetime.now() - dt.datetime.fromisoformat(dct[step][i][1])
+                    if dat.seconds // 60 > 5:
+                        file = open("authenticator.json", "w")
+                        dct[step].pop(i)
+                        json.dump(dct, file)
+                        file.close()
         for i in dct["admin"]:
             if adr[0] == i[0]:
-                return ("admin")
+                return "admin"
         return False
-    
-    def log_in(self, name, password):
-        file = open("authenticator.json", "r")
-        dct = json.loads(file.read())
-        file.close()
-        if password in self.__passwords:
-            for i in dct[password]:
-                if i[0] == name[0]:
-                    return
-            dct[self.__passwords[password]] += [[name[0], self.date()]]
-            file = open("authenticator.json", "w")
-            json.dump(dct, file)
+
+    def log_in_listing(self, name, password, ref):
+        print(name, password, ref)
+        if ref ==  self.href:
+            file = open("authenticator.json", "r")
+            dct = json.loads(file.read())
             file.close()
+            if password in self.__passwords["admin"]:
+                for i in dct["admin"]:
+                    if i[0] == name[0]:
+                        return
+                dct["admin"] += [[name[0], self.date()]]
+                file = open("authenticator.json", "w")
+                json.dump(dct, file)
+                file.close()
         return
 
     def sound(self, path):
@@ -123,7 +128,7 @@ class Net:
             for k in lst[i]:
                 add = ""
                 if i == "dir":
-                    string += f"<div class=\"features\">\n<a class=\"feature\" href=\"{self.href}{("listing/" + path[5:] + "/" + quote(k).replace("%28", "(").replace("%29", ")")).replace("//", "/")}\">\n<img class=\"icon\" src=\"{self.href}img/icons/folder.png\">\n<p>{k}</p>\n</a>\n</div>\n"
+                    string += f"<div class=\"features\">\n<a class=\"feature\" href=\"{self.href}{("listing/" + path[5:] + "/" + quote(k).replace("//", "/").replace("%28", "(").replace("%29", ")"))}\">\n<img class=\"icon\" src=\"{self.href}img/icons/folder.png\">\n<p>{k}</p>\n</a>\n</div>\n"
                 else:
                     if k.split(".")[-1] == "mp3":
                         add = f"<a class=\"feature-play\" href=\"{self.href}media.html?&{quote(path[5:]) + "/" + k}\"><img class=\"icon\" src=\"{self.href}img/icons/play.png\"></a>\n"
@@ -136,9 +141,43 @@ class Net:
         http_ask = f"HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length:{len(content)}\n\n"
         content = http_ask.encode("utf-8") + content
         return content
+
+    def create_file(self, hash, inside_file, filename, num):
+        inside_file = inside_file.decode()
+        Ref = ""
+        for i in inside_file.split("\r\n"):
+            if "Referer: " in i:
+                Ref = i
+        Ref = Ref.replace("Referer: ", "")
+        Ref = Ref.replace(self.href, "")
+        Ref = "data" + Ref[7:]
+        
+        file = open("data/upload/uploadId.json", "r", encoding="utf-8")
+        dct = json.loads(file.read())
+        file.close()
+
+        dct[hash] = {"name":filename, "number_of_chunks":num}
+
+        file = open("data/upload/uploadid.json", "w", encoding="utf-8")
+        json.dump(dct, file)
+        file.close()
+
+        with open(Ref + "/" + filename, "w") as file:
+            file.write("")
+    
+    def upload_start(self, hash):
+        file = open("data/upload/start", "r", encoding="utf-8")
+        content = file.read()
+        file.close()
+
+        content = content.replace(".upload_id.", hash)
+        return content.encode()
+    
+    def adding_to_file(self, inside_file):
+        pass
     
     def get_post_action(self, type):
-        return {"password": self.log_in}.get(type, False)
+        return {"password": self.log_in_listing}.get(type, False)
     
     @staticmethod
     def get_icon(exp):
@@ -155,30 +194,46 @@ class Net:
         files = open("server/logs.txt", "a", encoding="utf-8")
         files.write(f"\nServer was open at {dt.datetime.today()}\n")
         files.close()
-        signal.signal(signal.SIGINT, Net.closed)
 
 def show_content(request, name, host):
-    net = Net("data", f"http://{host[0]}:{host[1]}/")
-    lines = request.decode().split("\r\n")
-    method, path, http_v = lines[0].split(" ")
+    net = Net("data", f"http://{host[0]}/")
+    get_req = request
+    print(request)
+    lines = get_req.split(b"\r\n")
+    method, path, http_v = lines[0].decode().split(" ")
     path = unquote(path)
-    if http_v == "GAME":
-        if os.path.isfile(path):
-            return net.image(path, http=False)
+    path = path.replace("//", "/")
     if method == "POST":
-        messege = lines[14].split("=")
-        if messege[1]:
-            net.printl(f"type: \"{messege[0]}\"; messege: \"{messege[1]}\"; path: {path}{(31 - len(messege[0]) - len(messege[1]) - len(path)) * " "}| User adress - {name} | {net.date()} | <POST>")
-            func = net.get_post_action(messege[0])
-            if func:
-                func(name, messege[1])
+        if path == "/upload/start":
+            dct_start_upload = request.split(b"\r\n\r\n")[-1].split(b"\"")
+            filename = dct_start_upload[3].decode()
+            number_of_chunks = int(dct_start_upload[8][1:-1])
+            hash = hashlib.sha256(filename.encode("utf_8")).hexdigest()
+            net.create_file(hash, request, filename, number_of_chunks)
+            return net.upload_start(hash)
+        elif b"=" in lines[14]:
+            for i in lines:
+                if b"Host: " in i:
+                    Dhost = "http://" + i.decode().replace("Host: ", "") + "/"
+                    messege = lines[14].decode().split("=")
+                    if messege[1]:
+                        net.printl(f"type: \"{messege[0]}\"; messege: \"{messege[1]}\"; path: {path}{(31 - len(messege[0]) - len(messege[1]) - len(path)) * " "}| User adress - {name} | {net.date()} | <POST>")
+                        func = net.get_post_action(messege[0])
+                        if func:
+                            func(name, messege[1], Dhost)
+                    break
+    
     rules = net.authenticator(name)
+    Dpath = path.split("/")
+    while "" in Dpath:
+        Dpath.remove('')
     net.printl(f"{path}{(60 - len(path)) * ' '}| User adress - {name} | {net.date()} | <{method}>")
     if path == "/":
         return net.text("/index.html")
-    elif "listing" == path.split("/")[1]:
+    elif "listing" == Dpath[0]:
         if rules == ("admin"):
-            path = "data" + path.replace("listing", "").replace("//", "/")
+            path = "data/" + "/".join(Dpath[1:])
+            print(path)
             if os.path.isdir(path):
                 return net.listing(path)
         else:
@@ -188,12 +243,12 @@ def show_content(request, name, host):
             if "/private/" in path:
                 if rules != ("admin"):
                     return net.text("/authenticator.html")
-            exp = path.split(".")[-1]
+            exp = Dpath[-1].split(".")[-1]
             extension = get_extensions(net, exp)
             if extension:
                 return extension(path)
         return net.text(path)
-    elif path.split("/")[1].split("?&")[0] == ("media.html"):
+    elif Dpath[0].split("?&")[0] == ("media.html"):
         path = path.replace("media.html?&", "")
         if os.path.isfile(net.chest + path):
             return net.media(path)
