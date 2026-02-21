@@ -100,7 +100,8 @@ class Net:
         string = file.read()
         file.close()
         if add_data:
-            string = string.replace(add_data[0], add_data[1])
+            for i in add_data:
+                string = string.replace(i[0], i[1])
         string = string.encode("utf-8")
         content = f"HTTP/1.1 {code_ask} OK\r\nContent-Type: text/html\r\nContent-Length:{len(string)}\r\n\r\n"
         return content.encode("utf-8") + string
@@ -165,17 +166,37 @@ class Net:
         with open(Ref + "/" + filename, "w") as file:
             file.write("")
     
-    def upload_start(self, hash):
-        file = open("data/upload/start", "r", encoding="utf-8")
-        content = file.read()
+    def adding_to_file(self, request, hash):
+        content = b"\n".join(request.split(b"\r\n\r\n")[2].split(b"\r\n")[:-2])
+        file = open("data/upload/uploadId.json", "r", encoding="utf-8")
+        filename = json.load(file)[hash]["name"]
         file.close()
 
-        content = content.replace(".upload_id.", hash)
-        return content.encode()
-    
-    def adding_to_file(self, inside_file):
-        pass
-    
+        ref = ""
+        for i in request.split(b"\r\n"):
+            if b"Referer: " in i:
+                ref = i.decode()
+                break
+        ref = ref.replace("Referer: ", "")
+        ref = ref.replace(self.href, "")
+        if ref.split("/")[0] == "listing":
+            ref = ref[7:]
+        
+        print("data" + ref + "/" + filename)
+        with open("data/" + ref + "/" + filename, "ab") as file:
+            file.write(content)
+
+    def upload_finish(self, hash):
+        file = open("data/upload/finish", "r", encoding="utf-8")
+        dct = dict(json.loads(file.read()))
+        file.close()
+
+        dct = dct.pop(hash)
+
+        file = open("data/upload/finish", "w", encoding="utf-8")
+        json.dump(dct, file)
+        file.close()
+
     def get_post_action(self, type):
         return {"password": self.log_in_listing}.get(type, False)
     
@@ -198,7 +219,6 @@ class Net:
 def show_content(request, name, host):
     net = Net("data", f"http://{host[0]}/")
     get_req = request
-    print(request)
     lines = get_req.split(b"\r\n")
     method, path, http_v = lines[0].decode().split(" ")
     path = unquote(path)
@@ -210,19 +230,35 @@ def show_content(request, name, host):
             number_of_chunks = int(dct_start_upload[8][1:-1])
             hash = hashlib.sha256(filename.encode("utf_8")).hexdigest()
             net.create_file(hash, request, filename, number_of_chunks)
-            return net.upload_start(hash)
-        elif b"=" in lines[14]:
-            for i in lines:
-                if b"Host: " in i:
-                    Dhost = "http://" + i.decode().replace("Host: ", "") + "/"
-                    messege = lines[14].decode().split("=")
-                    if messege[1]:
-                        net.printl(f"type: \"{messege[0]}\"; messege: \"{messege[1]}\"; path: {path}{(31 - len(messege[0]) - len(messege[1]) - len(path)) * " "}| User adress - {name} | {net.date()} | <POST>")
-                        func = net.get_post_action(messege[0])
-                        if func:
-                            func(name, messege[1], Dhost)
-                    break
-    
+            return net.text("/upload/start", add_data=((".upload_id.", hash),))
+        elif path == "/upload/chunk":
+            print(request)
+            hash = request.split(b"\r\n\r\n")[-4].split(b"\r\n")[0].decode()
+            net.adding_to_file(request, hash)
+            return net.text("/upload/chunk", add_data=((".upload_id.", hash),))
+        # elif path == "/upload/finish":
+        #     dct = json.loads(request.split(b"\r\n\r\n")[-1].decode())
+        #     Ref = ""
+        #     for i in request.decode().split("\r\n"):
+        #         if "Referer: " in i:
+        #             Ref = i
+        #     Ref = Ref.replace("Referer: ", "")
+        #     Ref = Ref.replace(net.href, "")
+        #     Ref = "data" + Ref[7:]
+        #     net.upload_finish(dct["uploadId"])
+        #     net.text("/upload/finish", add_data=((".upload_id.", dct["uploadId"]), (".name.", dct["filename"]), ("##", str(dct["fileSize"]))))
+        elif len(lines) > 14:
+            if b"=" in lines[14]:
+                for i in lines:
+                    if b"Host: " in i:
+                        Dhost = "http://" + i.decode().replace("Host: ", "") + "/"
+                        messege = lines[14].decode().split("=")
+                        if messege[1]:
+                            net.printl(f"type: \"{messege[0]}\"; messege: \"{messege[1]}\"; path: {path}{(31 - len(messege[0]) - len(messege[1]) - len(path)) * " "}| User adress - {name} | {net.date()} | <POST>")
+                            func = net.get_post_action(messege[0])
+                            if func:
+                                func(name, messege[1], Dhost)
+                        break
     rules = net.authenticator(name)
     Dpath = path.split("/")
     while "" in Dpath:
@@ -252,7 +288,7 @@ def show_content(request, name, host):
         path = path.replace("media.html?&", "")
         if os.path.isfile(net.chest + path):
             return net.media(path)
-    return net.text("/Error.html", descriptions="Error", add_data=((".actual_domen.", net.href)), code_ask=404)
+    return net.text("/Error.html", descriptions="Error", add_data=((".actual_domen.", net.href),), code_ask=404)
     
 
 def get_extensions(obj: Net, extension):

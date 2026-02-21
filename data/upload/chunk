@@ -1,0 +1,7 @@
+{
+    "success": true,
+    "uploadId": ".upload_id.",
+    "chunkIndex": 1,
+    "receivedSize": 1048576,
+    "message": "Чанк успешно получен"
+}

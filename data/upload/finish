@@ -1,0 +1,8 @@
+{
+    "success": true,
+    "uploadId": ".upload_id.",
+    "filename": ".name.",
+    "fileSize": ##,
+    "fileUrl": ".ref.",
+    "message": "Файл успешно загружен"
+}

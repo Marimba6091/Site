@@ -5,7 +5,7 @@ from server.net import Net
 
 
 def greet(con, adr, host):
-    request = con.recv(2_147_483_648)
+    request = con.recv(2_097_152)
     if request:
         con.send(show_content(request, adr, host))
         con.close()
